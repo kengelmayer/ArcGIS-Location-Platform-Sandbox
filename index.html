@@ -3,79 +3,52 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta
-    name="description"
-    content="Small, understandable lessons for the ArcGIS Location Platform."
-  >
   <title>ArcGIS Location Platform Sandbox</title>
-
   <link rel="stylesheet" href="styles.css">
-
-  <script>
-    // The ArcGIS SDK reads this global configuration when it loads.
-    var esriConfig = {};
-  </script>
 </head>
-
 <body>
-  <div id="auth" class="auth">
+  <section id="auth" class="auth">
     <form id="auth-form" class="auth-card">
       <p class="eyebrow">ArcGIS Location Platform</p>
       <h1>Developer Sandbox</h1>
-      <p>
-        Enter your ArcGIS API key to open the lessons. The key stays in this
-        browser tab and is never written to the repository.
-      </p>
-
-      <label for="api-key">ArcGIS API key</label>
-      <input
-        id="api-key"
-        type="password"
-        autocomplete="off"
-        placeholder="AAPK..."
-        required
-      >
-
+      <p>Enter your ArcGIS API key to try the lessons. It is stored in this browser tab only.</p>
+      <label for="api-key">API key</label>
+      <input id="api-key" type="password" autocomplete="off" placeholder="AAPK..." required>
       <button type="submit">Start sandbox</button>
-      <p id="auth-error" class="error" role="alert" hidden></p>
     </form>
-  </div>
+  </section>
 
   <div id="app" class="app" hidden>
     <header class="topbar">
-      <button
-        id="menu-button"
-        class="menu-button"
-        type="button"
-        aria-controls="lesson-sidebar"
-        aria-expanded="false"
-      >
-        Lessons
-      </button>
-
-      <div>
-        <p class="eyebrow">ArcGIS Location Platform</p>
-        <strong>Developer Sandbox</strong>
-      </div>
-
-      <button id="change-key" class="quiet-button" type="button">
-        Change API key
-      </button>
+      <button id="menu" type="button" class="quiet mobile-menu" aria-controls="sidebar" aria-expanded="false">Lessons</button>
+      <strong>ArcGIS Location Platform Sandbox</strong>
+      <button id="change-key" type="button" class="quiet">Change API key</button>
     </header>
 
-    <aside id="lesson-sidebar" class="sidebar" aria-label="Lesson navigation">
-      <div class="sidebar-heading">
-        <span>Lessons</span>
-        <small id="lesson-count"></small>
-      </div>
-      <nav id="lesson-navigation"></nav>
+    <aside id="sidebar" class="sidebar" aria-label="Lessons">
+      <h2>Lessons</h2>
+      <nav id="navigation"></nav>
     </aside>
 
-    <main id="lesson" class="lesson" tabindex="-1">
-      <p class="loading">Loading lesson…</p>
+    <main class="main">
+      <div class="toolbar">
+        <h1 id="lesson-title">Mapping</h1>
+        <div class="actions">
+          <button id="toggle-code" type="button" class="quiet" aria-pressed="false">Show code</button>
+          <button id="run-code" type="button" hidden>Run code</button>
+          <button id="reset-code" type="button" class="quiet" hidden>Reset</button>
+        </div>
+      </div>
+      <div id="workspace" class="workspace">
+        <iframe id="preview" title="Interactive ArcGIS lesson"></iframe>
+        <section id="code-panel" class="code-panel" aria-label="Editable lesson HTML" hidden>
+          <p id="code-status" class="code-status" role="status"></p>
+          <div id="editor-host" hidden></div>
+          <textarea id="code-input" spellcheck="false" aria-label="Lesson HTML source"></textarea>
+        </section>
+      </div>
     </main>
   </div>
-
   <script type="module" src="app.js"></script>
 </body>
 </html>

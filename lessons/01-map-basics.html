@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2D maps and basemaps</title>
+  <style>
+    /* Everything needed to display this independent lesson. */
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: #25333d; }
+    arcgis-map { display: block; height: 67vh; min-height: 360px; }
+    article { max-width: 760px; margin: auto; padding: 26px 24px 60px; }
+    h1 { line-height: 1.2; }
+    h2 { margin-top: 30px; }
+    a { color: #006da8; }
+  </style>
+  <script>
+    // Reuse the API key entered on the sandbox homepage.
+    var esriConfig = { apiKey: sessionStorage.getItem("ARCGIS_API_KEY") || "" };
+  </script>
+  <script type="module" src="https://js.arcgis.com/5.1/"></script>
+</head>
+<body>
+  <!-- A complete 2D map built from declarative ArcGIS Web Components. -->
+  <arcgis-map basemap="arcgis/topographic" center="8.77,50.81" zoom="11">
+    <arcgis-zoom slot="top-left"></arcgis-zoom>
+    <arcgis-compass slot="top-left"></arcgis-compass>
+    <arcgis-scale-bar slot="bottom-left" unit="metric"></arcgis-scale-bar>
+    <arcgis-basemap-toggle slot="bottom-right" next-basemap="arcgis/imagery"></arcgis-basemap-toggle>
+  </arcgis-map>
+
+  <article>
+    <h1>Display and navigate a 2D map</h1>
+    <p>A basemap provides geographic context: roads, labels, terrain and imagery. This map begins over Marburg, Germany.</p>
+
+    <h2>What you see</h2>
+    <p>The map fills the upper part of the page. Zoom and compass are at the top left, a metric scale bar at the bottom left, and a basemap toggle at the bottom right.</p>
+
+    <h2>How it works</h2>
+    <p>The <code>&lt;arcgis-map&gt;</code> element creates the map. Its <code>basemap</code>, <code>center</code> and <code>zoom</code> attributes configure the initial view. Child components add controls using <code>slot</code> positions. No JavaScript is needed to construct the map.</p>
+
+    <h2>Try it</h2>
+    <ol>
+      <li>Zoom and pan to another location, then inspect the scale bar.</li>
+      <li>Switch between topographic and imagery basemaps.</li>
+      <li>Open the code panel and change <code>center</code>, <code>zoom</code> or <code>basemap</code>. Click <strong>Run code</strong>.</li>
+    </ol>
+
+    <h2>What's next?</h2>
+    <p>Maps can display feature layers, graphics, popups and many other web components. Basemaps provide context; operational layers carry your application data.</p>
+
+    <h2>Documentation</h2>
+    <ul>
+      <li><a href="https://developers.arcgis.com/javascript/latest/references/map-components/components/arcgis-map/" target="_blank" rel="noreferrer">ArcGIS Map component</a></li>
+      <li><a href="https://developers.arcgis.com/javascript/latest/get-api/" target="_blank" rel="noreferrer">Use the ArcGIS CDN</a></li>
+    </ul>
+  </article>
+</body>
+</html>

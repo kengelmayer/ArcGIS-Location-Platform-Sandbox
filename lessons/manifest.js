@@ -1,11 +1,6 @@
-import mapBasics from "./01-map-basics.js";
-import placeSearch from "./02-place-search.js";
-import sceneBasics from "./03-scene-basics.js";
-
-// This is the lesson order shown in the navigation.
-// Add or remove one import and one array entry when changing the curriculum.
+// Only this list controls the lesson navigation.
 export const lessons = [
-  mapBasics,
-  placeSearch,
-  sceneBasics,
+  { id: "map-basics", title: "2D maps and basemaps", file: "lessons/01-map-basics.html" },
+  { id: "place-search", title: "Find addresses and places", file: "lessons/02-place-search.html" },
+  { id: "scene-basics", title: "Explore terrain in 3D", file: "lessons/03-scene-basics.html" },
 ];

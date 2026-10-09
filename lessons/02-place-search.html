@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Find addresses and places</title>
+  <style>
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: #25333d; }
+    arcgis-map { display: block; height: 67vh; min-height: 360px; }
+    article { max-width: 760px; margin: auto; padding: 26px 24px 60px; }
+    h1 { line-height: 1.2; }
+    h2 { margin-top: 30px; }
+    a { color: #006da8; }
+  </style>
+  <script>
+    // Geocoding requests use the sandbox's browser-session API key.
+    var esriConfig = { apiKey: sessionStorage.getItem("ARCGIS_API_KEY") || "" };
+  </script>
+  <script type="module" src="https://js.arcgis.com/5.1/"></script>
+</head>
+<body>
+  <!-- Search provides input, suggestions, result graphics and navigation. -->
+  <arcgis-map basemap="arcgis/navigation" center="8.77,50.81" zoom="6">
+    <arcgis-zoom slot="top-left"></arcgis-zoom>
+    <arcgis-search slot="top-right" placeholder="Find an address or place"></arcgis-search>
+  </arcgis-map>
+
+  <article>
+    <h1>Find addresses and places</h1>
+    <p>Geocoding converts a place name or postal address into a geographic location you can display on a map.</p>
+
+    <h2>What you see</h2>
+    <p>The top-right search field suggests matching addresses and places. Selecting a result navigates to the location and displays a marker.</p>
+
+    <h2>How it works</h2>
+    <p>The <code>&lt;arcgis-search&gt;</code> component connects its search interface to the map. It handles suggestions, geocoding and map navigation. The browser uses your API key for the ArcGIS Geocoding service; the key needs geocoding access.</p>
+
+    <h2>Try it</h2>
+    <ol>
+      <li>Search for <em>Marburg, Germany</em>, then try a precise street address.</li>
+      <li>Search for a landmark and compare the results.</li>
+      <li>Change the initial map <code>zoom</code> or the search <code>placeholder</code> in the code panel.</li>
+    </ol>
+
+    <h2>What's next?</h2>
+    <p>Applications can filter search sources, show multiple candidates and reverse-geocode coordinates. For precise use cases, inspect the result's match quality instead of assuming that every result identifies a rooftop.</p>
+
+    <h2>Documentation</h2>
+    <ul>
+      <li><a href="https://developers.arcgis.com/javascript/latest/references/map-components/components/arcgis-search/" target="_blank" rel="noreferrer">ArcGIS Search component</a></li>
+      <li><a href="https://developers.arcgis.com/documentation/mapping-and-location-services/geocoding/" target="_blank" rel="noreferrer">Geocoding service overview</a></li>
+    </ul>
+  </article>
+</body>
+</html>

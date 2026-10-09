@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lesson title</title>
+  <style>
+    /* Keep the complete example readable and independent. */
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: #25333d; }
+    arcgis-map { display: block; height: 67vh; min-height: 360px; }
+    article { max-width: 760px; margin: auto; padding: 26px 24px 60px; }
+    h1 { line-height: 1.2; }
+    h2 { margin-top: 30px; }
+    a { color: #006da8; }
+  </style>
+  <script>
+    // Reuse the sandbox's API key. Never hardcode credentials in a lesson.
+    var esriConfig = { apiKey: sessionStorage.getItem("ARCGIS_API_KEY") || "" };
+  </script>
+  <script type="module" src="https://js.arcgis.com/5.1/"></script>
+</head>
+<body>
+  <!-- Replace this minimal map with the one capability the lesson teaches. -->
+  <arcgis-map basemap="arcgis/topographic" center="8.77,50.81" zoom="11"></arcgis-map>
+
+  <article>
+    <h1>Lesson title</h1>
+    <p>One sentence about the immediate result and learning objective.</p>
+
+    <h2>What you see</h2>
+    <p>Describe the visible map and each interactive control.</p>
+
+    <h2>How it works</h2>
+    <p>Explain the relevant ArcGIS components, services, and data flow.</p>
+
+    <h2>Try it</h2>
+    <ol>
+      <li>One action in the live application.</li>
+      <li>One simple HTML attribute or value to change using Run code.</li>
+    </ol>
+
+    <h2>What's next?</h2>
+    <p>Give a realistic extension, a limitation, or when to use this capability.</p>
+
+    <h2>Documentation</h2>
+    <ul>
+      <li><a href="https://developers.arcgis.com/documentation/" target="_blank" rel="noreferrer">Relevant official ArcGIS documentation — replace with a specific page</a></li>
+    </ul>
+  </article>
+</body>
+</html>

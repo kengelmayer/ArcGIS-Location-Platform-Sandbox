@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Explore terrain in 3D</title>
+  <style>
+    body { margin: 0; font: 16px/1.6 system-ui, sans-serif; color: #25333d; }
+    arcgis-scene { display: block; height: 67vh; min-height: 360px; }
+    article { max-width: 760px; margin: auto; padding: 26px 24px 60px; }
+    h1 { line-height: 1.2; }
+    h2 { margin-top: 30px; }
+    a { color: #006da8; }
+  </style>
+  <script>
+    // Basemap and elevation requests use the same browser-session API key.
+    var esriConfig = { apiKey: sessionStorage.getItem("ARCGIS_API_KEY") || "" };
+  </script>
+  <script type="module" src="https://js.arcgis.com/5.1/"></script>
+</head>
+<body>
+  <!-- Camera attributes make an initial 3D view possible without custom JS. -->
+  <arcgis-scene
+    basemap="arcgis/topographic"
+    ground="world-elevation"
+    camera-position="8.77,50.81,5000"
+    camera-tilt="65"
+    camera-heading="25"
+  >
+    <arcgis-zoom slot="top-left"></arcgis-zoom>
+    <arcgis-navigation-toggle slot="top-left"></arcgis-navigation-toggle>
+    <arcgis-compass slot="top-left"></arcgis-compass>
+  </arcgis-scene>
+
+  <article>
+    <h1>Explore terrain in 3D</h1>
+    <p>A 3D scene combines a basemap with elevation and a virtual camera. It is useful when height and terrain change the interpretation of a location.</p>
+
+    <h2>What you see</h2>
+    <p>A tilted view of the landscape near Marburg. Zoom, navigation mode and compass controls are in the upper-left corner.</p>
+
+    <h2>How it works</h2>
+    <p>The <code>&lt;arcgis-scene&gt;</code> element creates a 3D view. The <code>ground</code> attribute requests World Elevation; <code>camera-position</code>, <code>camera-tilt</code> and <code>camera-heading</code> define the initial viewpoint. Your API key must have access to the basemap and elevation services.</p>
+
+    <h2>Try it</h2>
+    <ol>
+      <li>Move and rotate the camera with the scene controls.</li>
+      <li>Modify <code>camera-tilt</code> to compare a top-down view with an oblique view.</li>
+      <li>Change <code>camera-heading</code> and click <strong>Run code</strong>.</li>
+    </ol>
+
+    <h2>What's next?</h2>
+    <p>3D applications can display buildings, integrated meshes, point clouds and scene layers. Prefer a 2D map when elevation or perspective does not add useful information.</p>
+
+    <h2>Documentation</h2>
+    <ul>
+      <li><a href="https://developers.arcgis.com/javascript/latest/references/map-components/components/arcgis-scene/" target="_blank" rel="noreferrer">ArcGIS Scene component</a></li>
+      <li><a href="https://developers.arcgis.com/documentation/mapping-and-location-services/elevation/" target="_blank" rel="noreferrer">ArcGIS Elevation services</a></li>
+    </ul>
+  </article>
+</body>
+</html>

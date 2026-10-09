@@ -1,217 +1,164 @@
 import { lessons } from "./lessons/manifest.js";
 
-const ARCGIS_SDK_URL = "https://js.arcgis.com/5.1/";
-const API_KEY_STORAGE_NAME = "ARCGIS_API_KEY";
+const $ = (selector) => document.querySelector(selector);
+const auth = $("#auth");
+const app = $("#app");
+const preview = $("#preview");
+const workspace = $("#workspace");
+const codePanel = $("#code-panel");
+const codeInput = $("#code-input");
+const showCode = $("#toggle-code");
+const runCode = $("#run-code");
+const resetCode = $("#reset-code");
+const codeStatus = $("#code-status");
+let currentLesson;
+let originalCode = "";
+let editor;
+let editorLoading;
+let requestId = 0;
 
-const auth = document.querySelector("#auth");
-const authForm = document.querySelector("#auth-form");
-const authInput = document.querySelector("#api-key");
-const authError = document.querySelector("#auth-error");
-const app = document.querySelector("#app");
-const lessonElement = document.querySelector("#lesson");
-const lessonNavigation = document.querySelector("#lesson-navigation");
-const lessonCount = document.querySelector("#lesson-count");
-const menuButton = document.querySelector("#menu-button");
-const sidebar = document.querySelector("#lesson-sidebar");
-const changeKeyButton = document.querySelector("#change-key");
-
-let sdkPromise;
-let cleanupCurrentLesson;
-
-function loadArcGIS() {
-  if (sdkPromise) {
-    return sdkPromise;
-  }
-
-  sdkPromise = new Promise((resolve, reject) => {
-    const sdk = document.createElement("script");
-    sdk.type = "module";
-    sdk.src = ARCGIS_SDK_URL;
-    sdk.onload = resolve;
-    sdk.onerror = () => reject(new Error("The ArcGIS Maps SDK could not be loaded."));
-    document.head.append(sdk);
-  });
-
-  return sdkPromise;
-}
-
-function getSelectedLesson() {
-  const requestedId = location.hash.slice(1);
-  return lessons.find((lesson) => lesson.id === requestedId) ?? lessons[0];
-}
-
-function renderNavigation() {
-  lessonCount.textContent = String(lessons.length);
-  lessonNavigation.replaceChildren();
-
-  lessons.forEach((lesson, index) => {
-    const link = document.createElement("a");
-    link.className = "lesson-link";
-    link.href = `#${lesson.id}`;
-    link.innerHTML = `
-      <span class="lesson-number">${String(index + 1).padStart(2, "0")}</span>
-      <span>${lesson.title}</span>
-    `;
-    lessonNavigation.append(link);
-  });
-}
-
-function createExplanationSection(section) {
-  const element = document.createElement("section");
-  const paragraphs = section.paragraphs
-    .map((paragraph) => `<p>${paragraph}</p>`)
-    .join("");
-  const bullets = section.bullets?.length
-    ? `<ul>${section.bullets.map((item) => `<li>${item}</li>`).join("")}</ul>`
-    : "";
-
-  element.innerHTML = `<h2>${section.title}</h2>${paragraphs}${bullets}`;
-  return element;
-}
-
-function renderLessonText(lesson) {
-  const tags = lesson.tags.map((tag) => `<span class="tag">${tag}</span>`).join("");
-  const tryItems = lesson.tryIt.map((item) => `<li>${item}</li>`).join("");
-  const references = lesson.references
-    .map(
-      (reference) => `
-        <li>
-          <a href="${reference.url}" target="_blank" rel="noreferrer">
-            ${reference.label}
-          </a>
-        </li>
-      `,
-    )
-    .join("");
-
-  lessonElement.innerHTML = `
-    <header class="lesson-header">
-      <p class="eyebrow">Lesson ${String(lessons.indexOf(lesson) + 1).padStart(2, "0")}</p>
-      <h1>${lesson.title}</h1>
-      <p class="lesson-summary">${lesson.summary}</p>
-      <div class="tag-list">${tags}</div>
-    </header>
-
-    <div id="lesson-stage" class="lesson-stage" aria-label="Interactive lesson"></div>
-
-    <div class="lesson-body">
-      <article id="lesson-explanation" class="explanation"></article>
-
-      <aside class="lesson-aside">
-        <section>
-          <h2>Try it</h2>
-          <ol>${tryItems}</ol>
-        </section>
-
-        <section>
-          <h2>Sources</h2>
-          <ul class="reference-list">${references}</ul>
-        </section>
-      </aside>
-
-      <section class="code-panel">
-        <h2>The complete lesson code</h2>
-        <pre><code id="lesson-code"></code></pre>
-      </section>
-    </div>
-  `;
-
-  const explanation = document.querySelector("#lesson-explanation");
-  lesson.explanation.forEach((section) => {
-    explanation.append(createExplanationSection(section));
-  });
-
-  document.querySelector("#lesson-code").textContent = lesson.code;
-}
-
-async function renderSelectedLesson() {
-  if (app.hidden) {
-    return;
-  }
-
-  const lesson = getSelectedLesson();
-
-  if (!location.hash) {
-    history.replaceState(null, "", `#${lesson.id}`);
-  }
-
-  if (cleanupCurrentLesson) {
-    await cleanupCurrentLesson();
-    cleanupCurrentLesson = undefined;
-  }
-
-  renderLessonText(lesson);
-
-  document.querySelectorAll(".lesson-link").forEach((link) => {
-    if (link.hash === `#${lesson.id}`) {
-      link.setAttribute("aria-current", "page");
-    } else {
-      link.removeAttribute("aria-current");
-    }
-  });
-
-  sidebar.classList.remove("is-open");
-  menuButton.setAttribute("aria-expanded", "false");
+// Each lesson runs as a real HTML document in a same-origin iframe.
+function selectLesson() {
+  if (app.hidden) return;
+  const lesson = lessons.find((item) => item.id === location.hash.slice(1)) || lessons[0];
+  if (!lesson) return;
+  if (!location.hash) history.replaceState(null, "", `#${lesson.id}`);
+  currentLesson = lesson;
+  $("#lesson-title").textContent = lesson.title;
   document.title = `${lesson.title} | ArcGIS Sandbox`;
-
-  try {
-    cleanupCurrentLesson = await lesson.mount(document.querySelector("#lesson-stage"));
-  } catch (error) {
-    console.error(error);
-    document.querySelector("#lesson-stage").innerHTML = `
-      <p class="fatal-error">
-        This lesson could not start. Check the browser console and confirm that
-        your API key has the privileges required by this example.
-      </p>
-    `;
-  }
-
-  lessonElement.focus({ preventScroll: true });
-  scrollTo({ top: 0, behavior: "auto" });
+  preview.removeAttribute("srcdoc");
+  preview.src = lesson.file;
+  $("#navigation").querySelectorAll("a").forEach((link) => {
+    link.setAttribute("aria-current", String(link.hash === `#${lesson.id}`));
+  });
+  $("#sidebar").classList.remove("open");
+  $("#menu").setAttribute("aria-expanded", "false");
+  if (!codePanel.hidden) loadSource(lesson);
 }
 
-async function startSandbox(apiKey) {
-  const trimmedKey = apiKey.trim();
-
-  if (!trimmedKey) {
-    return;
-  }
-
-  authError.hidden = true;
-  sessionStorage.setItem(API_KEY_STORAGE_NAME, trimmedKey);
-  esriConfig.apiKey = trimmedKey;
-
+async function loadSource(lesson) {
+  const id = ++requestId;
+  codeStatus.textContent = "Loading HTML…";
   try {
-    await loadArcGIS();
-    auth.hidden = true;
-    app.hidden = false;
-    renderNavigation();
-    await renderSelectedLesson();
+    const response = await fetch(lesson.file);
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const html = await response.text();
+    if (id !== requestId) return;
+    originalCode = html;
+    setCode(html);
+    codeStatus.textContent = "Edit the HTML, then click Run code (Ctrl/Cmd + Enter).";
   } catch (error) {
-    authError.textContent = error.message;
-    authError.hidden = false;
+    if (id === requestId) codeStatus.textContent = `Cannot load source: ${error.message}`;
   }
 }
 
-authForm.addEventListener("submit", (event) => {
+function getCode() {
+  return editor ? editor.getValue() : codeInput.value;
+}
+
+function setCode(text) {
+  codeInput.value = text;
+  if (editor) editor.setValue(text);
+}
+
+// Monaco is optional and loads only when the developer opens the code panel.
+function loadMonaco() {
+  if (editorLoading) return editorLoading;
+  editorLoading = new Promise((resolve) => {
+    const cdn = "https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs";
+    const script = document.createElement("script");
+    script.src = `${cdn}/loader.js`;
+    script.onload = () => {
+      window.require.config({ paths: { vs: cdn } });
+      window.require(["vs/editor/editor.main"], () => {
+        $("#editor-host").hidden = false;
+        editor = window.monaco.editor.create($("#editor-host"), {
+          value: codeInput.value,
+          language: "html",
+          theme: "vs-dark",
+          automaticLayout: true,
+          minimap: { enabled: false },
+          wordWrap: "on",
+          fontSize: 13,
+        });
+        editor.addCommand(window.monaco.KeyMod.CtrlCmd | window.monaco.KeyCode.Enter, runPreview);
+        codeInput.hidden = true;
+        resolve();
+      }, () => resolve());
+    };
+    script.onerror = () => resolve(); // Editable textarea remains available offline.
+    document.head.append(script);
+  });
+  return editorLoading;
+}
+
+function runPreview() {
+  // srcdoc inherits this page's origin, so the lesson reads the existing tab's sessionStorage.
+  preview.srcdoc = getCode();
+  codeStatus.textContent = "Preview updated. Changes are not saved to the HTML file.";
+}
+
+$("#auth-form").addEventListener("submit", (event) => {
   event.preventDefault();
-  startSandbox(authInput.value);
+  const key = $("#api-key").value.trim();
+  if (!key) return;
+  sessionStorage.setItem("ARCGIS_API_KEY", key);
+  auth.hidden = true;
+  app.hidden = false;
+  selectLesson();
 });
 
-changeKeyButton.addEventListener("click", () => {
-  sessionStorage.removeItem(API_KEY_STORAGE_NAME);
+$("#change-key").addEventListener("click", () => {
+  sessionStorage.removeItem("ARCGIS_API_KEY");
   location.reload();
 });
 
-menuButton.addEventListener("click", () => {
-  const isOpen = sidebar.classList.toggle("is-open");
-  menuButton.setAttribute("aria-expanded", String(isOpen));
+$("#menu").addEventListener("click", () => {
+  const open = $("#sidebar").classList.toggle("open");
+  $("#menu").setAttribute("aria-expanded", String(open));
 });
 
-window.addEventListener("hashchange", renderSelectedLesson);
+showCode.addEventListener("click", async () => {
+  const open = codePanel.hidden;
+  codePanel.hidden = !open;
+  workspace.classList.toggle("split", open);
+  showCode.textContent = open ? "Hide code" : "Show code";
+  showCode.setAttribute("aria-pressed", String(open));
+  runCode.hidden = resetCode.hidden = !open;
+  if (open) {
+    await loadSource(currentLesson);
+    await loadMonaco();
+    editor?.layout();
+  }
+});
 
-const storedKey = sessionStorage.getItem(API_KEY_STORAGE_NAME);
+runCode.addEventListener("click", runPreview);
+codeInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+    event.preventDefault();
+    runPreview();
+  }
+});
+resetCode.addEventListener("click", () => {
+  setCode(originalCode);
+  preview.removeAttribute("srcdoc");
+  preview.src = currentLesson.file;
+  codeStatus.textContent = "Restored the original lesson.";
+});
 
-if (storedKey) {
-  startSandbox(storedKey);
+window.addEventListener("hashchange", selectLesson);
+
+// The manifest controls the list; no lesson logic belongs in the shell.
+const navigation = $("#navigation");
+lessons.forEach((lesson, index) => {
+  const link = document.createElement("a");
+  link.href = `#${lesson.id}`;
+  link.textContent = `${String(index + 1).padStart(2, "0")}  ${lesson.title}`;
+  navigation.append(link);
+});
+
+if (sessionStorage.getItem("ARCGIS_API_KEY")) {
+  auth.hidden = true;
+  app.hidden = false;
+  selectLesson();
 }
