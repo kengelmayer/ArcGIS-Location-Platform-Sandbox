@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta
+    name="description"
+    content="Small, understandable lessons for the ArcGIS Location Platform."
+  >
+  <title>ArcGIS Location Platform Sandbox</title>
+
+  <link rel="stylesheet" href="styles.css">
+
+  <script>
+    // The ArcGIS SDK reads this global configuration when it loads.
+    var esriConfig = {};
+  </script>
+</head>
+
+<body>
+  <div id="auth" class="auth">
+    <form id="auth-form" class="auth-card">
+      <p class="eyebrow">ArcGIS Location Platform</p>
+      <h1>Developer Sandbox</h1>
+      <p>
+        Enter your ArcGIS API key to open the lessons. The key stays in this
+        browser tab and is never written to the repository.
+      </p>
+
+      <label for="api-key">ArcGIS API key</label>
+      <input
+        id="api-key"
+        type="password"
+        autocomplete="off"
+        placeholder="AAPK..."
+        required
+      >
+
+      <button type="submit">Start sandbox</button>
+      <p id="auth-error" class="error" role="alert" hidden></p>
+    </form>
+  </div>
+
+  <div id="app" class="app" hidden>
+    <header class="topbar">
+      <button
+        id="menu-button"
+        class="menu-button"
+        type="button"
+        aria-controls="lesson-sidebar"
+        aria-expanded="false"
+      >
+        Lessons
+      </button>
+
+      <div>
+        <p class="eyebrow">ArcGIS Location Platform</p>
+        <strong>Developer Sandbox</strong>
+      </div>
+
+      <button id="change-key" class="quiet-button" type="button">
+        Change API key
+      </button>
+    </header>
+
+    <aside id="lesson-sidebar" class="sidebar" aria-label="Lesson navigation">
+      <div class="sidebar-heading">
+        <span>Lessons</span>
+        <small id="lesson-count"></small>
+      </div>
+      <nav id="lesson-navigation"></nav>
+    </aside>
+
+    <main id="lesson" class="lesson" tabindex="-1">
+      <p class="loading">Loading lesson…</p>
+    </main>
+  </div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

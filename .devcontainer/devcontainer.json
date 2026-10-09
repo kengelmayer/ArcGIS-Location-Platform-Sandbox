@@ -1,0 +1,12 @@
+{
+  "name": "ArcGIS Location Platform Sandbox",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12-bookworm",
+  "forwardPorts": [8080],
+  "portsAttributes": {
+    "8080": {
+      "label": "ArcGIS Sandbox",
+      "onAutoForward": "openBrowser"
+    }
+  },
+  "postAttachCommand": "nohup python -m http.server 8080 --bind 0.0.0.0 > /tmp/arcgis-sandbox.log 2>&1 &"
+}
